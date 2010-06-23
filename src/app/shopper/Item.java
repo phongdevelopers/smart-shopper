@@ -1,5 +1,6 @@
 package app.shopper;
 
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
@@ -49,6 +50,7 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		// TODO Auto-generated method stub
+		Log.d("Smart Shopper", name+ " "+ isChecked);
 		display = isChecked;
 	}
 
