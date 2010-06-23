@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, shopper!</string>
+    <string name="app_name">Smart Shopper</string>
+<string name="add_item">Add Item</string>
+<string name="cancel">Cancel</string>
+<string name="add_item_title">Add New Item</string>
+<string name="item_list">Switch to Shopping List</string>
+<string name="shopping_list">Switch to Item List</string>
+</resources>
