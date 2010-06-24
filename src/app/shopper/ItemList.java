@@ -14,12 +14,10 @@ public class ItemList {
 	shopper parent;
 
 	public void addItem(Item item) {
-		// TODO Auto-generated method stub
 		itemList.add(item);
 	}
 
 	public View display(boolean shoppingList) {
-		// TODO Auto-generated method stub
 		LinearLayout ll = new LinearLayout(shopper.con);
 		ll.setOrientation(LinearLayout.VERTICAL);
 		Iterator<Item> iterator = itemList.iterator();
@@ -39,8 +37,9 @@ public class ItemList {
 	}
 	
 	public void deleteItem(long id){
+		if(id==0)return;
 		Iterator<Item> iterator = itemList.iterator();
-		for (int i=0;i<=id;i++)
+		for (int i=1;i<=id;i++)
 		iterator.next();
 		iterator.remove();
 	}
@@ -80,4 +79,15 @@ public class ItemList {
 		editor.commit();	
 	}
 
+	public long search(CharSequence text) {
+		Iterator<Item> iterator = itemList.iterator();
+		int index = 1;
+		while(iterator.hasNext()){
+			if(iterator.next().name.compareToIgnoreCase((String) text)==0 )
+				return index;
+			index++;
+		}
+		Log.d(shopper.tag, "Unable to find" + text);
+		return 0;
+	}
 }

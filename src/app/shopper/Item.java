@@ -65,7 +65,6 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		// TODO Auto-generated method stub
 		Log.d("Smart Shopper", name+ " "+ isChecked);
 		display = isChecked;
 	}
@@ -73,14 +72,12 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 
 	@Override
 	public int compareTo(Item another) {
-		// TODO Auto-generated method stub
 		return(name.compareToIgnoreCase(another.name));
 	}
 
 
 	@Override
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
 		bought();
 		v.setVisibility(View.GONE);
 	}
