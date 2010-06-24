@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -59,7 +60,6 @@ public class shopper extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
 		int button = v.getId();
 		Log.d(tag, "Layout - " + layout+"  Button - "+button);
 		switch(layout){
@@ -96,7 +96,6 @@ public class shopper extends Activity implements OnClickListener {
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = settings.edit();
@@ -120,6 +119,7 @@ public class shopper extends Activity implements OnClickListener {
 			//return true;
 		case 01234567:
 			selected.setVisibility(View.GONE);
+			itemList.deleteItem(itemList.search(((CheckBox)selected).getText()));
 			//itemList.deleteItem(info.id);
 			//displayItemList();
 			return true;
