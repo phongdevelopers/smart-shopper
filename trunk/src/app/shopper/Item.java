@@ -5,21 +5,37 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickListener{
 	String name;
 	String quantity,defaultQuantity;
-	boolean display=false;
+	boolean display=true;
 	boolean selected=false;
-	CheckBox check;
+	//CheckBox check;
 	
-	CheckBox draw(boolean shoppingList){
-
-		CheckBox check=new CheckBox(shopper.con);
-		check.setText(name);
-		check.setOnCheckedChangeListener(this);
-		return check;
+	View draw(boolean shoppingList){
+		if(shoppingList){
+			if(display){
+				TextView tView = new TextView(shopper.con);
+				tView.setText(name);
+				tView.setClickable(true);
+				tView.setOnClickListener(this);
+				tView.setTextSize(25);
+				tView.setLineSpacing(1, 1);
+				return tView;
+			}else 
+				return null;
+		}else{
+			CheckBox check=new CheckBox(shopper.con);
+			check.setText(name);
+			check.setChecked(display);
+			check.setOnCheckedChangeListener(this);
+			//check.setOnLongClickListener(this);
+			return check;
+		}
+		
 	}
 	
 
@@ -65,8 +81,7 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		
+		bought();
+		v.setVisibility(View.GONE);
 	}
-	
-	
 }

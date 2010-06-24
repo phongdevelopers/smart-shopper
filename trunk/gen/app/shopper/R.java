@@ -25,6 +25,7 @@ public final class R {
     public static final class layout {
         public static final int main=0x7f030000;
         public static final int newitem=0x7f030001;
+        public static final int shoppinglist=0x7f030002;
     }
     public static final class string {
         public static final int add_item=0x7f040002;
