@@ -2,70 +2,53 @@ package app.shopper;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ScrollView;
-import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
-public class shopper extends Activity implements OnCheckedChangeListener, OnClickListener {
+public class shopper extends Activity implements OnClickListener {
     static Context con;
     ItemList itemList ;
     int layout;
+    View selected;
+    static String tag= "Smart Shopper";
 
 	/** Called when the activity is first created. */
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Read file
-        //Display Lists
         Context con = this.getApplicationContext();
         shopper.con = con;
-        itemList =new ItemList();
-        /*//CheckBox check[] = null ;
-        for(int i =0;i<10;i++){
-		CheckBox check =  new CheckBox(this);
-		check.setText("Hello"+i); 
-		ll.addView(check);
-		check.setOnCheckedChangeListener(this);
-        //setContentView(R.layout.main);
-		}
-        
-        //item = new Item("stuff");
-        //setContentView(R.layout.main);
-        //ViewGroup display = (ViewGroup) this.findViewById(R.id.Button01);
-
-        //if(display!=null)
-        //ll.addView(item.draw(false));
-        //R.layout.main);*/
+        itemList =new ItemList(this);
+		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+		itemList.loadItemList(settings);
         displayItemList();
     }
 
-	@Override
-	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		// TODO Auto-generated method stub
-		Log.d("Smart Shopper", "click" + buttonView.getText()+" "+ isChecked);
-		System.out.println("sda");
-	}
-	
 	public void displayItemList(){
 		setContentViewCustom(R.layout.main);		 
 			ScrollView sc=(ScrollView) this.findViewById(R.id.ScrollView01);
-			sc.addView(itemList.display(false));		
+			sc.addView(itemList.display(false));	
+			registerForContextMenu(itemList.display(false));
 			this.findViewById(R.id.Button01).setOnClickListener(this);
 			this.findViewById(R.id.Button02).setOnClickListener(this);
 	}
 	
 	public void displayShoppingList(){
-		setContentViewCustom(R.layout.main);
+		setContentViewCustom(R.layout.shoppinglist);
 			ScrollView sc=(ScrollView) this.findViewById(R.id.ScrollView01);
 			sc.addView(itemList.display(true));		
 			this.findViewById(R.id.Button01).setOnClickListener(this);
-			this.findViewById(R.id.Button02).setOnClickListener(this);
+			//this.findViewById(R.id.Button02).setOnClickListener(this);
 	}
 	
 	public void displayNewItem(){
@@ -78,20 +61,31 @@ public class shopper extends Activity implements OnCheckedChangeListener, OnClic
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		int button = v.getId();
-		Log.d("Smart Shopper", "Layout - " + layout+"  Button - "+button);
+		Log.d(tag, "Layout - " + layout+"  Button - "+button);
 		switch(layout){
 		case R.layout.main:
 			switch(button){
-			case R.id.Button01:break;
+			case R.id.Button01:displayShoppingList();break;
 			case R.id.Button02:displayNewItem();break;
 			}
 			break;
 		case R.layout.newitem:
 			switch(button){
-			case R.id.Button01:itemList.addItem(new Item(((EditText) this.findViewById(R.id.EditText01)).getText().toString()));break;
+			case R.id.Button01:
+				String name = ((EditText) this.findViewById(R.id.EditText01)).getText().toString();
+				if(name.length()>=1)
+					itemList.addItem(new Item(name));
+				//Log.d(tag, name.length()+"");
+				break;
 			case R.id.Button02:break;
 			}
 			displayItemList();break;
+		case R.layout.shoppinglist:
+			switch(button){
+			case R.id.Button01:displayItemList();break;
+			//case R.id.Button02:displayNewItem();break;
+			}
+			break;
 		}		
 	}
 	
@@ -99,5 +93,39 @@ public class shopper extends Activity implements OnCheckedChangeListener, OnClic
 		setContentView(id);
 		layout = id;
 	}
-    
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = settings.edit();
+		itemList.saveItemList(editor);
+	}   
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
+		//super.onCreateContextMenu(menu, v, menuInfo);
+		//menu.add(0, EDIT_ID, 0, "Edit");
+		menu.add(0, 01234567, 0,  "Delete");
+		selected = v;
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		Log.d(tag, info==null?"null":"nah");
+		switch (item.getItemId()) {
+		//case EDIT_ID:
+			//editNote(info.id);
+			//return true;
+		case 01234567:
+			selected.setVisibility(View.GONE);
+			//itemList.deleteItem(info.id);
+			//displayItemList();
+			return true;
+		default:
+			//return super.onContextItemSelected(item);
+		}
+		return false;
+	}	
 }

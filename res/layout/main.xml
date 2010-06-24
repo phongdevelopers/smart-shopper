@@ -13,7 +13,7 @@
 
 
 
-<Button android:id="@+id/Button01" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/item_list"></Button><ScrollView android:id="@+id/ScrollView01" android:layout_width="wrap_content" android:layout_height="wrap_content"></ScrollView><Button android:id="@+id/Button02" android:layout_height="wrap_content" android:text="@string/add_item_title" android:layout_width="fill_parent"></Button>
+<Button android:id="@+id/Button01" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/item_list"></Button><ScrollView android:id="@+id/ScrollView01" android:layout_height="wrap_content" android:layout_width="fill_parent"></ScrollView><Button android:id="@+id/Button02" android:layout_height="wrap_content" android:text="@string/add_item_title" android:layout_width="fill_parent"></Button>
 
 
 
