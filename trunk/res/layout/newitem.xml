@@ -4,15 +4,12 @@
   android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="fill_parent">
 <TextView android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/add_item_title" android:textStyle="bold" android:lines="1" android:textSize="25sp">
 </TextView>
-<EditText android:id="@+id/EditText01" android:layout_height="wrap_content" android:hint="Enter Name Here" android:password="false" android:layout_width="fill_parent">
+<EditText android:id="@+id/EditText01" android:layout_height="wrap_content" android:hint="Enter Name Here" android:password="false" android:layout_width="fill_parent" android:inputType="textCapWords" android:lines="1">
 </EditText>
 
-<TableLayout android:id="@+id/TableLayout01" android:layout_height="wrap_content" android:layout_width="fill_parent" android:orientation="horizontal">
-<TableRow android:id="@+id/TableRow01" android:layout_height="wrap_content" android:layout_width="fill_parent">
-<Button android:id="@+id/Button01" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/add_item">
-</Button>
-<Button android:id="@+id/Button02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/cancel">
-</Button>
-</TableRow>
-</TableLayout>
+
+<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content"><Button android:id="@+id/Button02" android:layout_height="wrap_content" android:text="@string/cancel" android:layout_alignParentRight="true" android:layout_width="wrap_content">
+</Button><Button android:id="@+id/Button01" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/add_item" android:layout_toLeftOf="@+id/Button03">
+</Button><Button android:id="@+id/Button03" android:layout_height="wrap_content" android:layout_toLeftOf="@+id/Button02" android:text="@string/add_another" android:layout_width="wrap_content"></Button>
+</RelativeLayout>
 </LinearLayout>

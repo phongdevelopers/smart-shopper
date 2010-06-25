@@ -32,7 +32,7 @@ public class shopper extends Activity implements OnClickListener {
         itemList =new ItemList(this);
 		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
 		itemList.loadItemList(settings);
-        displayItemList();
+        displayItemList();//TODO more intelligent choise
     }
 
 	public void displayItemList(){
@@ -54,32 +54,52 @@ public class shopper extends Activity implements OnClickListener {
 	
 	public void displayNewItem(){
 		setContentViewCustom(R.layout.newitem);
+		this.findViewById(R.id.EditText01).requestFocus();
+		//TODO pop up keyboard
 		this.findViewById(R.id.Button01).setOnClickListener(this);
 		this.findViewById(R.id.Button02).setOnClickListener(this);
+		this.findViewById(R.id.Button03).setOnClickListener(this);
 	}
 
 	@Override
 	public void onClick(View v) {
 		int button = v.getId();
 		Log.d(tag, "Layout - " + layout+"  Button - "+button);
+		String name = null;
 		switch(layout){
 		case R.layout.main:
 			switch(button){
-			case R.id.Button01:displayShoppingList();break;
+			case R.id.Button01:
+				
+				displayShoppingList();break;
 			case R.id.Button02:displayNewItem();break;
 			}
 			break;
+			
+			
 		case R.layout.newitem:
-			switch(button){
-			case R.id.Button01:
-				String name = ((EditText) this.findViewById(R.id.EditText01)).getText().toString();
+			//processing
+			if(button == R.id.Button01||button == R.id.Button03){
+				name = ((EditText) this.findViewById(R.id.EditText01)).getText().toString();
 				if(name.length()>=1)
 					itemList.addItem(new Item(name));
 				//Log.d(tag, name.length()+"");
-				break;
-			case R.id.Button02:break;
+				//break;
 			}
-			displayItemList();break;
+			//control
+			switch(button){
+			case R.id.Button01:case R.id.Button02:
+				//TODO kill keyboard
+				this.findViewById(R.id.EditText01).clearFocus();displayItemList();break;
+			case R.id.Button03:
+				displayNewItem();
+				((EditText) this.findViewById(R.id.EditText01)).setHint("Added " + name + ". Enter Next.");
+				break;
+			}
+			//this.findViewById(R.id.EditText01).clearFocus();
+			break;
+			
+			
 		case R.layout.shoppinglist:
 			switch(button){
 			case R.id.Button01:displayItemList();break;
@@ -117,7 +137,7 @@ public class shopper extends Activity implements OnClickListener {
 		//case EDIT_ID:
 			//editNote(info.id);
 			//return true;
-		case 01234567:
+		case 01234567://TODO do delete the right way
 			selected.setVisibility(View.GONE);
 			itemList.deleteItem(itemList.search(((CheckBox)selected).getText()));
 			//itemList.deleteItem(info.id);
