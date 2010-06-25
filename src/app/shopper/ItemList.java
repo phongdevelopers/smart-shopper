@@ -21,12 +21,17 @@ public class ItemList {
 		LinearLayout ll = new LinearLayout(shopper.con);
 		ll.setOrientation(LinearLayout.VERTICAL);
 		Iterator<Item> iterator = itemList.iterator();
+		Item item=null;
 		while(iterator.hasNext()){
-			View v = iterator.next().draw(shoppingList);
-			if(v!=null)
-			ll.addView(v);
-			if(shoppingList==false)
-			parent.registerForContextMenu(v);
+			item = iterator.next();
+			if(item.isValid()){
+				View v = item.draw(shoppingList);
+				if(v!=null)
+				ll.addView(v);
+				if(shoppingList==false)
+				parent.registerForContextMenu(v);
+			}else
+				itemList.remove(item);
 		}
         return ll;
 	}
@@ -51,9 +56,10 @@ public class ItemList {
 	       while(index<=count){
 	    	   String itemCode = "item_"+index;
 	    	   String name = settings.getString(itemCode+"_name",null);
-	    	   boolean display = settings.getBoolean(itemCode+"_display", true);
+	    	   boolean display = settings.getBoolean(itemCode+"_display", false);
+	    	   boolean oneTime = settings.getBoolean(itemCode+"_oneTime", false);
 	    	   
-	    	   Item item = new Item(name);
+	    	   Item item = new Item(name,oneTime);
 	    	   item.display = display;
 	    	   itemList.add(item);
 	    	   index++;
@@ -70,6 +76,7 @@ public class ItemList {
 			
 			editor.putString(itemCode+"_name", item.name);
 			editor.putBoolean(itemCode+"_display",item.display);
+			editor.putBoolean(itemCode+"_oneTime",item.oneTime);
 			//add other variables
 			
 			index++;

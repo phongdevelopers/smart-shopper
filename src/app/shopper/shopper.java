@@ -3,6 +3,7 @@ package app.shopper;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -32,8 +33,19 @@ public class shopper extends Activity implements OnClickListener {
         itemList =new ItemList(this);
 		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
 		itemList.loadItemList(settings);
-        displayItemList();//TODO more intelligent choise
+        displayItemList();//TODO more intelligent choice
     }
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		// TODO Auto-generated method stub
+		super.onConfigurationChanged(newConfig);
+		switch(layout){
+		case R.layout.main:displayItemList();break;
+		case R.layout.newitem:displayNewItem();break;
+		case R.layout.shoppinglist:displayShoppingList();break;
+		}
+	}
 
 	public void displayItemList(){
 		setContentViewCustom(R.layout.main);		 
@@ -69,9 +81,7 @@ public class shopper extends Activity implements OnClickListener {
 		switch(layout){
 		case R.layout.main:
 			switch(button){
-			case R.id.Button01:
-				
-				displayShoppingList();break;
+			case R.id.Button01:displayShoppingList();break;
 			case R.id.Button02:displayNewItem();break;
 			}
 			break;
@@ -82,10 +92,11 @@ public class shopper extends Activity implements OnClickListener {
 			if(button == R.id.Button01||button == R.id.Button03){
 				name = ((EditText) this.findViewById(R.id.EditText01)).getText().toString();
 				if(name.length()>=1)
-					itemList.addItem(new Item(name));
+					itemList.addItem(new Item(name,((CheckBox) this.findViewById(R.id.CheckBox01)).isChecked()));
 				//Log.d(tag, name.length()+"");
 				//break;
 			}
+			
 			//control
 			switch(button){
 			case R.id.Button01:case R.id.Button02:
