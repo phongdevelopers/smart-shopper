@@ -13,9 +13,11 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 	String quantity,defaultQuantity;
 	boolean display=true;
 	boolean selected=false;
-	//CheckBox check;
+	boolean oneTime;
 	
 	View draw(boolean shoppingList){
+		String name =this.name ;
+		if(oneTime) name += " (once)";		
 		if(shoppingList){
 			if(display){
 				TextView tView = new TextView(shopper.con);
@@ -40,18 +42,18 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 	
 
 	public Item(String name) {
-		//super();
-		this(name,"1");
+		this(name,false,"1");
+	}
+	
+	public Item(String name,Boolean oneTime){
+		this(name,oneTime,"1");		
 	}
 
-	public Item(String name, String defaultQuantity ) {
-		//super();
+	public Item(String name, Boolean oneTime,String defaultQuantity ) {
 		this.name = name;
 		this.defaultQuantity = defaultQuantity;
 		quantity = null;
-		//check=new CheckBox(shopper.con);
-		//check.setText(name);
-		//check.setOnCheckedChangeListener(this);
+		this.oneTime = oneTime;
 	}
 	
 	public void toBuy(){
@@ -80,5 +82,13 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 	public void onClick(View v) {
 		bought();
 		v.setVisibility(View.GONE);
+	}
+
+
+	public boolean isValid() {
+		// TODO Auto-generated method stub
+		if(oneTime&&!display)
+			return false;
+		else return true;
 	}
 }

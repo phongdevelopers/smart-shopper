@@ -8,4 +8,5 @@
 <string name="item_list">Switch to Shopping List</string>
 <string name="shopping_list">Switch to Item List</string>
 <string name="add_another">Add Another</string>
+<string name="one_time">One Time Entry</string>
 </resources>
