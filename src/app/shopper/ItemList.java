@@ -5,7 +5,6 @@ import java.util.TreeSet;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -16,7 +15,23 @@ public class ItemList {
 	public void addItem(Item item) {
 		itemList.add(item);
 	}
-
+	
+	public void deleteItem(Item item){
+		itemList.remove(item);
+	}
+	
+	public void deleteItem(String name){
+		deleteItem(search(name));
+	}
+	
+	public void deleteItem(long id){
+		if(id==0)return;
+		Iterator<Item> iterator = itemList.iterator();
+		for (int i=1;i<=id;i++)
+		iterator.next();
+		iterator.remove();
+	}
+	
 	public View display(boolean shoppingList) {
 		LinearLayout ll = new LinearLayout(shopper.con);
 		ll.setOrientation(LinearLayout.VERTICAL);
@@ -31,7 +46,7 @@ public class ItemList {
 				if(shoppingList==false)
 				parent.registerForContextMenu(v);
 			}else
-				itemList.remove(item);
+				iterator.remove();
 		}
         return ll;
 	}
@@ -41,18 +56,10 @@ public class ItemList {
 		parent = shopper;
 	}
 	
-	public void deleteItem(long id){
-		if(id==0)return;
-		Iterator<Item> iterator = itemList.iterator();
-		for (int i=1;i<=id;i++)
-		iterator.next();
-		iterator.remove();
-	}
-	
 	public void loadItemList(SharedPreferences settings){
 	       int count = settings.getInt("item_count", 0),index =1;
 	       if( count ==0) return;
-	       Log.d(shopper.tag, count + " records");
+	       shopper.debug(count + " records");
 	       while(index<=count){
 	    	   String itemCode = "item_"+index;
 	    	   String name = settings.getString(itemCode+"_name",null);
@@ -66,12 +73,12 @@ public class ItemList {
 	       }
 	}
 	
-	public void saveItemList(Editor editor){		
-		editor.putInt("item_count", itemList.size());
+	public void saveItemList(Editor editor){			
 		Iterator<Item> iterator = itemList.iterator();
 		int index = 1;
 		while(iterator.hasNext()){
 			Item item = iterator.next();
+			if(!item.isValid())continue;
 			String itemCode = "item_"+index;
 			
 			editor.putString(itemCode+"_name", item.name);
@@ -81,8 +88,9 @@ public class ItemList {
 			
 			index++;
 		}
+		editor.putInt("item_count", index-1);
 		// Commit the edits!
-		Log.d(shopper.tag, itemList.size()+" items, saved "+ (index-1)+" records");
+		shopper.debug("Saved "+ (index-1)+" records");
 		editor.commit();	
 	}
 
@@ -94,7 +102,7 @@ public class ItemList {
 				return index;
 			index++;
 		}
-		Log.d(shopper.tag, "Unable to find" + text);
+		shopper.debug("Unable to find" + text);
 		return 0;
 	}
 }

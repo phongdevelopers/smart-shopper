@@ -1,6 +1,5 @@
 package app.shopper;
 
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
@@ -14,6 +13,7 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 	boolean display=true;
 	boolean selected=false;
 	boolean oneTime;
+	boolean deleteMe= false;
 	
 	View draw(boolean shoppingList){
 		String name =this.name ;
@@ -34,12 +34,9 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 			check.setText(name);
 			check.setChecked(display);
 			check.setOnCheckedChangeListener(this);
-			//check.setOnLongClickListener(this);
 			return check;
-		}
-		
-	}
-	
+		}		
+	}	
 
 	public Item(String name) {
 		this(name,false,"1");
@@ -62,12 +59,13 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 	
 	public void bought(){
 		display =false;
+		if(oneTime)deleteMe=true;
 	}
 
 
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		Log.d("Smart Shopper", name+ " "+ isChecked);
+		shopper.debug("name"+ " "+ isChecked);
 		display = isChecked;
 	}
 
@@ -86,9 +84,9 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 
 
 	public boolean isValid() {
-		// TODO Auto-generated method stub
-		if(oneTime&&!display)
+/*		if(oneTime&&!display)
 			return false;
-		else return true;
+		else return true;*/
+		return !deleteMe;
 	}
 }
