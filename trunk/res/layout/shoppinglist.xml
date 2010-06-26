@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_height="wrap_content" android:layout_width="fill_parent" android:orientation="vertical">
 <Button android:id="@+id/Button01" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/shopping_list"></Button>
-<ScrollView android:id="@+id/ScrollView01" android:layout_width="fill_parent" android:layout_height="fill_parent"></ScrollView>
+<ScrollView android:id="@+id/ScrollView01" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@+id/Button01"></ScrollView>
 
-</LinearLayout>
+</RelativeLayout>
