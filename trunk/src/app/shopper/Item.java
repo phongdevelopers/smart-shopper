@@ -1,5 +1,7 @@
 package app.shopper;
 
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
@@ -88,5 +90,18 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 			return false;
 		else return true;*/
 		return !deleteMe;
+	}
+
+	public void store(String itemCode, Editor editor) {
+		editor.putString(itemCode+"_name", name);
+		editor.putBoolean(itemCode+"_display",display);
+		editor.putBoolean(itemCode+"_oneTime",oneTime);
+		//add other variables
+	}
+
+	public void load(String itemCode, SharedPreferences settings) {
+ 	   name = settings.getString(itemCode+"_name",null);
+ 	   display = settings.getBoolean(itemCode+"_display", false);
+ 	   oneTime = settings.getBoolean(itemCode+"_oneTime", false);
 	}
 }
