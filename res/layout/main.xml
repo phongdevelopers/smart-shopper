@@ -4,17 +4,5 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-
-
-
-
-
-
-
-
-
 <Button android:id="@+id/Button01" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/item_list"></Button><Button android:id="@+id/Button02" android:layout_height="wrap_content" android:text="@string/add_item_title" android:layout_width="fill_parent" android:layout_alignParentBottom="true"></Button><ScrollView android:id="@+id/ScrollView01" android:layout_width="fill_parent" android:layout_below="@+id/Button01" android:layout_height="fill_parent" android:layout_above="@+id/Button02"></ScrollView>
-
-
-
 </RelativeLayout>

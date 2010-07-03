@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ScrollView;
@@ -33,14 +34,20 @@ public class shopper extends Activity implements OnClickListener {
 	
 	private static final int MENU_ABOUT = 31;
 	private static final int MENU_HELP = 32;
+	InputMethodManager imm;
     
     
     
 	public void displayItemList(){
-		setContentViewCustom(R.layout.main);		 
+		//hiding keyboard
+		if(layout == R.layout.newitem)
+			imm.hideSoftInputFromWindow(this.findViewById(R.id.EditText01).getWindowToken(), 0);
+		
+		setContentViewCustom(R.layout.main);	
 			ScrollView sc=(ScrollView) this.findViewById(R.id.ScrollView01);
 			sc.addView(itemList.display(false));	
 			registerForContextMenu(itemList.display(false));
+			this.findViewById(R.id.Button01).requestFocus();
 			this.findViewById(R.id.Button01).setOnClickListener(this);
 			this.findViewById(R.id.Button02).setOnClickListener(this);
 	}
@@ -49,13 +56,17 @@ public class shopper extends Activity implements OnClickListener {
 		setContentViewCustom(R.layout.shoppinglist);
 			ScrollView sc=(ScrollView) this.findViewById(R.id.ScrollView01);
 			sc.addView(itemList.display(true));		
+			this.findViewById(R.id.Button01).requestFocus();
 			this.findViewById(R.id.Button01).setOnClickListener(this);
 	}
 	
 	public void displayNewItem(){
 		setContentViewCustom(R.layout.newitem);
 			this.findViewById(R.id.EditText01).requestFocus();
-			//TODO pop up keyboard
+			
+			//pop up keyboard
+			imm.showSoftInput(this.findViewById(R.id.EditText01), InputMethodManager.SHOW_FORCED);
+			
 			this.findViewById(R.id.Button01).setOnClickListener(this);
 			this.findViewById(R.id.Button02).setOnClickListener(this);
 			this.findViewById(R.id.Button03).setOnClickListener(this);
@@ -79,6 +90,7 @@ public class shopper extends Activity implements OnClickListener {
 	    itemList =new ItemList(this);
 		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
 		itemList.loadItemList(settings);
+		imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 		if(itemList.itemList.isEmpty()||((ViewGroup) itemList.display(true)).getChildCount()==0)
 			displayItemList();
 		else 
