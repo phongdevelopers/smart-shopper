@@ -27,7 +27,7 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 				tView.setClickable(true);
 				tView.setOnClickListener(this);
 				tView.setTextSize(25);
-				tView.setLineSpacing(1, 1);
+				tView.setLineSpacing(1, (float) 1.5);
 				return tView;
 			}else 
 				return null;

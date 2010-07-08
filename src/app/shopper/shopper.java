@@ -25,6 +25,7 @@ public class shopper extends Activity implements OnClickListener {
     ItemList itemList ;
     int layout;
     View selected;
+    
     static String tag= "Smart Shopper";
     
     private static final int DELETE_ID = 11;
@@ -34,9 +35,7 @@ public class shopper extends Activity implements OnClickListener {
 	
 	private static final int MENU_ABOUT = 31;
 	private static final int MENU_HELP = 32;
-	InputMethodManager imm;
-    
-    
+	InputMethodManager imm;    
     
 	public void displayItemList(){
 		//hiding keyboard
@@ -72,12 +71,13 @@ public class shopper extends Activity implements OnClickListener {
 			this.findViewById(R.id.Button03).setOnClickListener(this);
 	}
 
-	@Override
-	public void onBackPressed() {
-		if(layout!=R.layout.main)
-			displayItemList();
-		else
-			super.onBackPressed();
+	public void setContentViewCustom(int id){
+		setContentView(id);
+		layout = id;
+	}
+
+	public static void debug(String debug){
+		Log.d(tag,debug);
 	}
 
 	/** Called when the activity is first created. */
@@ -98,6 +98,14 @@ public class shopper extends Activity implements OnClickListener {
 	}
 
 	@Override
+	protected void onStop() {
+		super.onStop();
+		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = settings.edit();
+		itemList.saveItemList(editor);
+	}
+
+	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		switch(layout){
@@ -105,6 +113,14 @@ public class shopper extends Activity implements OnClickListener {
 		case R.layout.newitem:displayNewItem();break;
 		case R.layout.shoppinglist:displayShoppingList();break;
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		if(layout!=R.layout.main)
+			displayItemList();
+		else
+			super.onBackPressed();
 	}
 
 	@Override
@@ -133,13 +149,13 @@ public class shopper extends Activity implements OnClickListener {
 			//control
 			switch(button){
 			case R.id.Button01:case R.id.Button02:
-				//TODO kill keyboard
 				this.findViewById(R.id.EditText01).clearFocus();
 				displayItemList();
 				break;
 			case R.id.Button03:
 				displayNewItem();
-				((EditText) this.findViewById(R.id.EditText01)).setHint("Added " + name + ". Enter Next.");
+				if(name.length()>=1)
+					((EditText) this.findViewById(R.id.EditText01)).setHint("Added " + name + ". Enter Next.");
 				break; 
 			}
 			break;
@@ -154,18 +170,6 @@ public class shopper extends Activity implements OnClickListener {
 		}		
 	}
 	
-	public void setContentViewCustom(int id){
-		setContentView(id);
-		layout = id;
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = settings.edit();
-		itemList.saveItemList(editor);
-	}   
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
 		menu.add(0, DELETE_ID, 0,  "Delete");
@@ -224,9 +228,5 @@ public class shopper extends Activity implements OnClickListener {
 	        dialog = null;
 	    }
 	    return dialog;
-	}	
-
-	public static void debug(String debug){
-		Log.d(tag,debug);
 	}
 }
