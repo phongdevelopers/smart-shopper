@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -15,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -49,6 +49,8 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	InputMethodManager imm;    
 	TabHost tabHost;
 	
+	Resources res;
+	
 	String hint = "";
 	
 	public void setUpTabs(){
@@ -60,12 +62,12 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 
 	    // Initialize a TabSpec for each tab and add it to the TabHost
 	    spec = tabHost.newTabSpec(itemlist);
-	    spec.setIndicator("Item List");
+	    spec.setIndicator("Item List", res.getDrawable(R.drawable.note));
 	    spec.setContent(this);//R.layout.main);
 	    tabHost.addTab(spec);
 
 	    // Do the same for the other tabs
-	    spec = tabHost.newTabSpec(shoppingList).setIndicator("Shopping List").setContent(this);//R.layout.shoppinglist);
+	    spec = tabHost.newTabSpec(shoppingList).setIndicator("Shopping List",res.getDrawable(R.drawable.icon_shopping_cart)).setContent(this);//R.layout.shoppinglist);
 	    tabHost.addTab(spec);
 
 	    tabHost.setOnTabChangedListener(this);
@@ -154,6 +156,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	    super.onCreate(savedInstanceState);
 		
 	    Context con = this.getApplicationContext();
+	    res = getResources();
 	    shopper.con = con;
 	    itemList =new ItemList(this);
 		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
