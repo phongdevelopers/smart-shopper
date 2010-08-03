@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnShowListener;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -27,7 +28,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabContentFactory;
 
-public class shopper extends TabActivity implements OnClickListener, OnTabChangeListener, TabContentFactory, OnCancelListener {
+public class shopper extends TabActivity implements OnClickListener, OnTabChangeListener, TabContentFactory, OnCancelListener, OnShowListener {
     static Context con;
     ItemList itemList ;
     int layout;
@@ -124,24 +125,11 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
     	layout=R.layout.newitem;
     	if(hint!="") 
     		((EditText) dialog.findViewById(R.id.EditText01)).setHint(hint);
-    	
-
-    	/*dialog.findViewById(R.id.EditText01).setOnFocusChangeListener(new View.OnFocusChangeListener() {
-    	    @Override
-    	    public void onFocusChange(View v, boolean hasFocus) {
-    	       // if (hasFocus) {
-    	        	imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);	
-    	       // }
-    	    }
-    	});*/
-    	//dialog.findViewById(R.id.EditText01).requestFocus();	
-        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,
-                InputMethodManager.HIDE_IMPLICIT_ONLY); 
-		//imm.showSoftInput(dialog.findViewById(R.id.EditText01), InputMethodManager.SHOW_FORCED);			
 		dialog.findViewById(R.id.Button03).setOnClickListener(this);
 		dialog.findViewById(R.id.Button01).setOnClickListener(this);
 		dialog.findViewById(R.id.Button02).setOnClickListener(this);
 		dialog.setOnCancelListener(this);
+		dialog.setOnShowListener(this);
 		hint = "";
 	}
 
@@ -187,13 +175,16 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 		case R.layout.shoppinglist:displayShoppingList();break;
 		}
 	}
-@Override
+	@Override
+	public void onShow(DialogInterface dialog) {
+	imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,InputMethodManager.HIDE_IMPLICIT_ONLY);
+	}
+
+	@Override
 	public void onCancel(DialogInterface dialog) {
-		// TODO Auto-generated method stub
 		onBackPressed();
 	}
 
-	//TODO bug pressback on new item then rotate phone
 	@Override
 	public void onBackPressed() {
 		if(layout!=R.layout.main){
@@ -338,7 +329,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 		if(id == DIALOG_NEW){
 			layout = R.layout.newitem;
 			displayNewItem(dialog);
-		}
-		super.onPrepareDialog(id, dialog);		
+		}	else
+		super.onPrepareDialog(id, dialog);	
 	}
 }
