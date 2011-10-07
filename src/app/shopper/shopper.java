@@ -1,8 +1,13 @@
 package app.shopper;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Map.Entry;
+
+import org.xmlpull.v1.XmlSerializer;
 
 import android.app.Dialog;
 import android.app.TabActivity;
@@ -14,7 +19,9 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
+import android.util.Xml;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +35,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TabHost;
+import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabContentFactory;
@@ -168,9 +176,13 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	@Override
 	protected void onStop() {
 		super.onStop();
+		saveItemList();
+	}
+	
+	protected void saveItemList(){
 		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = settings.edit();
-		itemList.saveItemList(editor);
+		itemList.saveItemList(editor);		
 	}
 
 	@Override
@@ -351,17 +363,84 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	}
 	
 	public void exportFile(){
+		//Save latest changes if any
+		saveItemList();
+		//Prepare to read all preferences
 		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
 		Set<?> allPrefs = settings.getAll().entrySet();
 		Iterator<?> prefIterator = allPrefs.iterator();
 		Entry<?, ?> entry;
-		while(prefIterator.hasNext()){
-			entry = (Entry<?, ?>) prefIterator.next();
-			String str = "key:" +entry.getKey()+"\tValue:"+entry.getValue();
-			debug(str);
-			
-		}
 		
+		//XML output preperations
+		String path =getExternalFilesDir(null)+"/smartshopper.xml";
+        File newxmlfile = new File(path);
+        //we have to bind the new file with a FileOutputStream
+        FileOutputStream fileos = null;        
+        try{
+                fileos = new FileOutputStream(newxmlfile);
+        }catch(FileNotFoundException e){
+                Log.e("FileNotFoundException", "can't create FileOutputStream");
+        }
+        //we create a XmlSerializer in order to write xml data
+        XmlSerializer serializer = Xml.newSerializer();
+        
+        //Write the XML file
+        try {
+            //we set the FileOutputStream as output for the serializer, using UTF-8 encoding
+                    serializer.setOutput(fileos, "UTF-8");
+                    //Write <?xml declaration with encoding (if encoding not null) and standalone flag (if standalone not null)
+                    serializer.startDocument(null, Boolean.valueOf(true));
+                    //set indentation option
+                    serializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
+                    //start a tag called "root"
+                    serializer.startTag(null, "root");
+                    //i indent code just to have a view similar to xml-tree
+	                    while(prefIterator.hasNext()){
+	            			entry = (Entry<?, ?>) prefIterator.next();
+	            			//String str = "key:" +entry.getKey()+"\tValue:"+entry.getValue();
+	            			//debug(str);
+
+	            			//save each preferences key in a "key" element
+	            			serializer.startTag(null, "key");
+	            				//Save the name in a nested "name" element
+		            			serializer.startTag(null, "name");
+		            			serializer.text(entry.getKey().toString());
+	                            serializer.endTag(null, "name");
+	                            
+	                            //Save the datatype in a nested "datatype" element
+		            			serializer.startTag(null, "datatype");
+		            			serializer.text(entry.getValue().getClass().toString());
+	                            serializer.endTag(null, "datatype");	                            
+
+	                            //Save the value in a nested "value" element
+		            			serializer.startTag(null, "value");
+		            			serializer.text(entry.getValue().toString());
+	                            serializer.endTag(null, "value");
+                            serializer.endTag(null, "key");
+	            		}
+                           /* serializer.startTag(null, "child1");
+                            serializer.endTag(null, "child1");
+                           
+                            serializer.startTag(null, "child2");
+                            //set an attribute called "attribute" with a "value" for <child2>
+                            serializer.attribute(null, "attribute", "value");
+                            serializer.endTag(null, "child2");
+                   
+                            serializer.startTag(null, "child3");
+                            //write some text inside <child3>
+                            serializer.text("some text inside child3");
+                            serializer.endTag(null, "child3");*/
+                           
+                    serializer.endTag(null, "root");
+                    serializer.endDocument();
+                    //write xml data into the FileOutputStream
+                    serializer.flush();
+                    //finally we close the file stream
+                    fileos.close();
+                    Toast.makeText(this, "Data Saved to "+ path+".", Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
+                    Log.e("Exception","error occurred while creating xml file");
+            }
 	}
 	
 	public void importFile(){
