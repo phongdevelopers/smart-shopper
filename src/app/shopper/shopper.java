@@ -1,5 +1,9 @@
 package app.shopper;
 
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Map.Entry;
+
 import android.app.Dialog;
 import android.app.TabActivity;
 import android.content.Context;
@@ -44,6 +48,9 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	
 	private static final int MENU_ABOUT = 31;
 	private static final int MENU_HELP = 32;
+	private static final int MENU_EXPORT = 33;
+	private static final int MENU_IMPORT = 34;
+	
 	private static final String shoppingList = "shoppingList";
 	private static final String itemlist = "itemList";
 	
@@ -263,6 +270,9 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 		super.onCreateOptionsMenu(menu);
 	    menu.add(0, MENU_ABOUT, 0, "About");
 	    menu.add(0, MENU_HELP, 0, "Help");
+
+	    menu.add(0, MENU_EXPORT, 0, "Export Data");
+	    menu.add(0, MENU_IMPORT, 0, "Import Data");
 	    return true;
 
 	}
@@ -276,6 +286,13 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	        return true;
 	    case MENU_HELP:
 	        showDialog(DIALOG_HELP);
+	        return true;
+	    case MENU_EXPORT:
+	    	exportFile();
+	        //showDialog(DIALOG_HELP);
+	        return true;
+	    case MENU_IMPORT:
+	        //showDialog(DIALOG_HELP);
 	        return true;
 	    }
 	    return false;
@@ -331,5 +348,24 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 			displayNewItem(dialog);
 		}	else
 		super.onPrepareDialog(id, dialog);	
+	}
+	
+	public void exportFile(){
+		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+		Set<?> allPrefs = settings.getAll().entrySet();
+		Iterator<?> prefIterator = allPrefs.iterator();
+		Entry<?, ?> entry;
+		while(prefIterator.hasNext()){
+			entry = (Entry<?, ?>) prefIterator.next();
+			String str = "key:" +entry.getKey()+"\tValue:"+entry.getValue();
+			debug(str);
+			
+		}
+		
+	}
+	
+	public void importFile(){
+		
+		
 	}
 }
