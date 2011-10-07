@@ -3,10 +3,21 @@ package app.shopper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
 import android.app.Dialog;
@@ -18,6 +29,7 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.content.res.XmlResourceParser;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -162,8 +174,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	    res = getResources();
 	    shopper.con = con;
 	    itemList =new ItemList(this);
-		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
-		itemList.loadItemList(settings);
+	    loadItemList();
 		imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 		
 		setUpTabs();
@@ -179,9 +190,13 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 		saveItemList();
 	}
 	
+	protected void loadItemList(){
+		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+		itemList.loadItemList(settings);
+	}
 	protected void saveItemList(){
 		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = settings.edit();
+		SharedPreferences.Editor editor = settings.edit().clear();
 		itemList.saveItemList(editor);		
 	}
 
@@ -304,6 +319,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	        //showDialog(DIALOG_HELP);
 	        return true;
 	    case MENU_IMPORT:
+	    	importFile();
 	        //showDialog(DIALOG_HELP);
 	        return true;
 	    }
@@ -385,6 +401,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
         XmlSerializer serializer = Xml.newSerializer();
         
         //Write the XML file
+        //Source of info:http://www.anddev.org/write_a_simple_xml_file_in_the_sd_card_using_xmlserializer-t8350.html
         try {
             //we set the FileOutputStream as output for the serializer, using UTF-8 encoding
                     serializer.setOutput(fileos, "UTF-8");
@@ -443,8 +460,59 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
             }
 	}
 	
+
 	public void importFile(){
-		
-		
+		//Java DOM : http://tutorials.jenkov.com/java-xml/dom.html
+
+		//Choose the app folder, and if not present root sdcard folder
+		String path = getExternalFilesDir(null)+"/smartshopper.xml";
+		if(!(new File(path).exists()))
+			path = Environment.getExternalStorageDirectory() + "/smartshopper.xml";
+
+		if(!(new File(path).exists())){
+			Toast.makeText(this, "XML file \"smartshopper.xml\" not found!", Toast.LENGTH_LONG).show();
+			return;
+		}
+		Document doc = null;
+		try {
+			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse("file://"+path);	
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		//clear all keys
+		SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit().clear();
+		NodeList keys = doc.getElementsByTagName("key");
+		String datatype,key,value;
+		debug("Found "+keys.getLength() +" keys, importing now.");
+		for(int i=0;i<keys.getLength();i++){
+			NodeList keyDet = keys.item(i).getChildNodes();
+			/*for(int j=0;j<keyDet.getLength();j++){
+				debug(keyDet.item(j).getNodeName());
+			}
+			debug(keyDet.getLength()+"");*/
+			key = 		keyDet.item(1).getFirstChild().getNodeValue().trim();
+			datatype = 	keyDet.item(3).getFirstChild().getNodeValue().trim();
+			value = 	keyDet.item(5).getFirstChild().getNodeValue().trim();
+			
+			
+			if(datatype.equals("class java.lang.Integer"))
+				editor.putInt(key,Integer.parseInt(value));
+			else if (datatype.equals("class java.lang.Boolean"))
+				editor.putBoolean(key,Boolean.parseBoolean(value));
+			else if (datatype.equals("class java.lang.String"))
+				editor.putString(key,value);
+			else
+				debug("Unrecognised datatype: "+datatype);
+			}
+		editor.commit();
+		loadItemList();
 	}
 }
