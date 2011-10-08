@@ -18,5 +18,7 @@
 <string name="help_text_2">This is a database of all items you have entered. If checked the item is added to the shopping list and removed if unchecked. To a new item click on the new item button.</string>
 <string name="help_text_3">Enter the name of the item. Next checkbox lets you list the item as a One time entry. This means if you buy it once and mark it off on the shopping list it is removed from the item list. Click Add item to add and return to item list or Add another to continue adding.</string>
 <string name="help_text_4">This view shows a list of items that are checked in the item list. After purchasing them, just click on their name to remove them from the list.</string>
+<string name="help_text_export">This function exports the data into a xml file in the external storage of the phone. The path is (sdcard)/Android/Data/app.shopper/files/smartshopper.xml . DO NOT delete the app after exporting, otherwise the exported file is deleted and the data is lost. Refer to the next section for instructions to import the data.</string>
+<string name="help_text_import">This function WILL DELETE ALL DATA that was previously present and import the exported data. The file that was exported can be imported from either the same location or the root directory of the external storage, to repopulate the data as it was. Place the file in either of these 2 locations and trigger the import functionality to import the data</string>
 
 </resources>
