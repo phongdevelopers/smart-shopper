@@ -3,7 +3,6 @@ package app.shopper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
@@ -15,9 +14,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
 import android.app.Dialog;
@@ -29,7 +25,6 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.content.res.XmlResourceParser;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -203,11 +198,15 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
+		refreshView();
+	}
+
+	public void refreshView(){
 		switch(layout){
-		case R.layout.main:showItemList();break;
-		case R.layout.newitem:showNewItem();break;//displayNewItem();break;
-		case R.layout.shoppinglist:displayShoppingList();break;
-		}
+                case R.layout.main:showItemList();break;
+                case R.layout.newitem:showNewItem();break;//displayNewItem();break;
+                case R.layout.shoppinglist:displayShoppingList();break;
+                }
 	}
 	@Override
 	public void onShow(DialogInterface dialog) {
@@ -378,7 +377,12 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 		super.onPrepareDialog(id, dialog);	
 	}
 	
-	public void exportFile(){
+	public String exportFile(){
+		String path = exportFile("smartshopper.xml");
+		Toast.makeText(this, "Data Saved to "+ path+".", Toast.LENGTH_LONG).show();
+		return path;
+	}
+	public String exportFile(String fileName){
 		//Save latest changes if any
 		saveItemList();
 		//Prepare to read all preferences
@@ -388,7 +392,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 		Entry<?, ?> entry;
 		
 		//XML output preperations
-		String path =getExternalFilesDir(null)+"/smartshopper.xml";
+		String path =getExternalFilesDir(null)+"/"+fileName;
         File newxmlfile = new File(path);
         //we have to bind the new file with a FileOutputStream
         FileOutputStream fileos = null;        
@@ -454,10 +458,10 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
                     serializer.flush();
                     //finally we close the file stream
                     fileos.close();
-                    Toast.makeText(this, "Data Saved to "+ path+".", Toast.LENGTH_LONG).show();
             } catch (Exception e) {
                     Log.e("Exception","error occurred while creating xml file");
             }
+		return path;
 	}
 	
 
@@ -469,6 +473,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 		if(!(new File(path).exists()))
 			path = Environment.getExternalStorageDirectory() + "/smartshopper.xml";
 
+		//if still not found pop an error and exit out of the function
 		if(!(new File(path).exists())){
 			Toast.makeText(this, "XML file \"smartshopper.xml\" not found!", Toast.LENGTH_LONG).show();
 			return;
@@ -486,7 +491,8 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		exportFile("smartshopper_bac.xml");
+		Toast.makeText(this, "Existing Data Backed up as smartshopper_bac.xml", Toast.LENGTH_LONG).show();
 		//clear all keys
 		SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit().clear();
 		NodeList keys = doc.getElementsByTagName("key");
@@ -514,5 +520,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 			}
 		editor.commit();
 		loadItemList();
+		refreshView();
+		Toast.makeText(this, "Data Imported", Toast.LENGTH_SHORT).show();
 	}
 }
