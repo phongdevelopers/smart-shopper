@@ -11,6 +11,8 @@ import java.util.Map.Entry;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -65,6 +67,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	private static final int MENU_HELP = 32;
 	private static final int MENU_EXPORT = 33;
 	private static final int MENU_IMPORT = 34;
+	private static final int MENU_IMPORT_OLD_FORMAT = 35;
 	
 	private static final String shoppingList = "shoppingList";
 	private static final String itemlist = "itemList";
@@ -168,12 +171,11 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	    Context con = this.getApplicationContext();
 	    res = getResources();
 	    shopper.con = con;
-	    itemList =new ItemList(this);
 	    loadItemList();
 		imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 		
 		setUpTabs();
-		if(itemList.itemList.isEmpty()||((ViewGroup) itemList.display(true)).getChildCount()==0)
+		if(itemList.getItemList().isEmpty()||((ViewGroup) itemList.display(true)).getChildCount()==0)
 			showItemList();
 		else 
 			showShoppingList();
@@ -186,13 +188,15 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	}
 	
 	protected void loadItemList(){
-		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
-		itemList.loadItemList(settings);
+		loadFile();
+		//SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+		//itemList.loadItemList(settings);
 	}
 	protected void saveItemList(){
-		SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = settings.edit().clear();
-		itemList.saveItemList(editor);		
+		saveFile();
+		//SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+		//SharedPreferences.Editor editor = settings.edit().clear();
+		//itemList.saveItemList(editor);		
 	}
 
 	@Override
@@ -299,6 +303,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 
 	    menu.add(0, MENU_EXPORT, 0, "Export Data");
 	    menu.add(0, MENU_IMPORT, 0, "Import Data");
+	    menu.add(0, MENU_IMPORT_OLD_FORMAT, 0, "Import Data (Old format)");
 	    return true;
 
 	}
@@ -314,12 +319,13 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	        showDialog(DIALOG_HELP);
 	        return true;
 	    case MENU_EXPORT:
-	    	exportFile();
-	        //showDialog(DIALOG_HELP);
+	    	saveFile(true);
 	        return true;
 	    case MENU_IMPORT:
+	    	loadFile(true);
+	        return true;
+	    case MENU_IMPORT_OLD_FORMAT:
 	    	importFile();
-	        //showDialog(DIALOG_HELP);
 	        return true;
 	    }
 	    return false;
@@ -377,11 +383,60 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 		super.onPrepareDialog(id, dialog);	
 	}
 	
-	public String exportFile(){
-		String path = exportFile("smartshopper.xml");
-		Toast.makeText(this, "Data Saved to "+ path+".", Toast.LENGTH_LONG).show();
-		return path;
+	private final String fileName = "smartshopper.xml";
+	
+	private String getStorageFilePath(Boolean externalStorage){
+		return ((externalStorage? getExternalFilesDir(null):getFilesDir()) + "/" + fileName).toString();
 	}
+	
+	private void saveFile(){saveFile(false);}
+		
+	public void saveFile(Boolean externalStorage)
+	{
+		String path =getStorageFilePath(externalStorage);
+		
+		Serializer serializer = new Persister();
+   	    
+		try {
+			// Write to System.out
+			serializer.write(itemList, System.out);
+			
+			// Write to File
+			serializer.write(itemList, new File(path));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	    
+
+		if(externalStorage)
+			Toast.makeText(this, "Data Saved to "+ path+".", Toast.LENGTH_LONG).show();
+	}
+	
+	private void loadFile(){loadFile(false);}
+	
+	public void loadFile(Boolean externalStorage)
+	{
+		String path = getStorageFilePath(externalStorage);
+		if(externalStorage && !(new File(path).exists()))
+			path = Environment.getExternalStorageDirectory() + "/"+fileName;
+
+		//if still not found pop an error and exit out of the function
+		if(!(new File(path).exists())){
+			Toast.makeText(this, "XML file \"smartshopper.xml\" not found!", Toast.LENGTH_LONG).show();
+			return;
+		}
+		
+		Serializer serializer = new Persister();
+		File source = new File(path);
+
+		try {
+			itemList = serializer.read(ItemList.class, source);
+		    itemList.setParent(this);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+	}
+	
+	@Deprecated 
 	public String exportFile(String fileName){
 		//Save latest changes if any
 		saveItemList();
@@ -464,7 +519,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 		return path;
 	}
 	
-
+	@Deprecated 
 	public void importFile(){
 		//Java DOM : http://tutorials.jenkov.com/java-xml/dom.html
 
