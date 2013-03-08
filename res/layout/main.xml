@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >
-<Button android:id="@+id/Button02" android:layout_height="wrap_content" android:text="@string/add_item_title" android:layout_width="fill_parent" android:layout_alignParentBottom="true" android:onClick="onClick"></Button><ScrollView android:id="@+id/ScrollView01" android:layout_width="fill_parent" android:layout_below="@+id/Button01" android:layout_height="fill_parent" android:layout_above="@+id/Button02"></ScrollView>
+    android:orientation="vertical"
+    tools:context=".shopper" >
+
+    <Button
+        android:id="@+id/Button02"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:onClick="onClick"
+        android:text="@string/add_item_title" >
+    </Button>
+
+    <ScrollView
+        android:id="@+id/ScrollView01"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/Button02"
+        android:layout_below="@+id/Button01"
+        android:layout_centerHorizontal="true" >
+    </ScrollView>
+
 </RelativeLayout>

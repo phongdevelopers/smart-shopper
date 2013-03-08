@@ -3,8 +3,6 @@ package app.shopper;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Order;
 
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
@@ -124,20 +122,5 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 			return false;
 		else return true;*/
 		return !deleteMe;
-	}
-
-	@Deprecated
-	public void store(String itemCode, Editor editor) {
-		editor.putString(itemCode+"_name", name);
-		editor.putBoolean(itemCode+"_display",onShoppingList);
-		editor.putBoolean(itemCode+"_oneTime",oneTime);
-		//add other variables
-	}
-
-	@Deprecated
-	public void load(String itemCode, SharedPreferences settings) {
- 	   name = settings.getString(itemCode+"_name",null);
- 	   onShoppingList = settings.getBoolean(itemCode+"_display", false);
- 	   oneTime = settings.getBoolean(itemCode+"_oneTime", false);
 	}
 }
