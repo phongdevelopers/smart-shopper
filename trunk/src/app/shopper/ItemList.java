@@ -6,8 +6,6 @@ import java.util.TreeSet;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -91,40 +89,5 @@ public class ItemList {
 				iterator.remove();
 		}
         return ll;
-	}
-
-	@Deprecated 
-	public void loadItemList(SharedPreferences settings){
-	       int count = settings.getInt("item_count", 0),index =1;
-	       if( count ==0) return;
-	       shopper.debug(count + " records");
-	       while(index<=count){
-	    	   String itemCode = "item_"+index;
-
-	    	   Item item = new Item(null);
-	    	   item.load(itemCode,settings); 	  
-	    	   
-	    	   itemList.add(item);
-	    	   index++;
-	       }
-	}
-	
-	@Deprecated 
-	public void saveItemList(Editor editor){			
-		Iterator<Item> iterator = itemList.iterator();
-		int index = 1;
-		while(iterator.hasNext()){
-			Item item = iterator.next();
-			if(!item.isValid())continue;
-			String itemCode = "item_"+index;
-			
-			item.store(itemCode,editor);
-			
-			index++;
-		}
-		editor.putInt("item_count", index-1);
-		// Commit the edits!
-		shopper.debug("Saved "+ (index-1)+" records");
-		editor.commit();	
 	}
 }
