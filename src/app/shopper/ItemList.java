@@ -3,18 +3,43 @@ package app.shopper;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
+
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.view.View;
 import android.widget.LinearLayout;
 
+@Root
 public class ItemList {
-	TreeSet<Item> itemList =new TreeSet<Item>();
-	shopper parent;
+	@ElementList
+	private TreeSet<Item> itemList =new TreeSet<Item>();
+	private shopper parent;
 	
+	public shopper getParent() {
+		return parent;
+	}
+
+	public void setParent(shopper parent) {
+		this.parent = parent;
+	}
+
 	public ItemList(shopper shopper) {
 		super();
 		parent = shopper;
+	}
+	//for simple xml
+	public ItemList() {
+		super();
+	}
+	
+	public TreeSet<Item> getItemList() {
+		return itemList;
+	}
+
+	public void setItemList(TreeSet<Item> itemList) {
+		this.itemList = itemList;
 	}
 	
 	public void addItem(Item item) {
@@ -41,7 +66,7 @@ public class ItemList {
 		Iterator<Item> iterator = itemList.iterator();
 		int index = 1;
 		while(iterator.hasNext()){
-			if(iterator.next().name.compareToIgnoreCase((String) text)==0 )
+			if(iterator.next().getName().compareToIgnoreCase((String) text)==0 )
 				return index;
 			index++;
 		}
@@ -68,7 +93,7 @@ public class ItemList {
         return ll;
 	}
 
-
+	@Deprecated 
 	public void loadItemList(SharedPreferences settings){
 	       int count = settings.getInt("item_count", 0),index =1;
 	       if( count ==0) return;
@@ -84,6 +109,7 @@ public class ItemList {
 	       }
 	}
 	
+	@Deprecated 
 	public void saveItemList(Editor editor){			
 		Iterator<Item> iterator = itemList.iterator();
 		int index = 1;
