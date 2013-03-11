@@ -1,6 +1,8 @@
 package app.shopper;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
@@ -15,6 +17,9 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -35,7 +40,7 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.Toast;
 
-public class shopper extends TabActivity implements OnClickListener, OnTabChangeListener, TabContentFactory, OnCancelListener, OnShowListener {
+public class ShopperFragmentActivity extends FragmentActivity implements OnClickListener, OnTabChangeListener, OnCancelListener, OnShowListener, ViewPager.OnPageChangeListener {
     static Context con;
     ItemList itemList ;
     int layout;
@@ -58,37 +63,83 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 	private static final String itemlist = "itemList";
 	
 	InputMethodManager imm;    
-	TabHost tabHost;
+	private TabHost mTabHost;
+	private ViewPager mViewPager;
+	private ShoppingListPagerAdapter mPagerAdapter;
 	
 	Resources res;
 	
 	String hint = "";
 	
-	public void setUpTabs(){
-	    setContentView(R.layout.tabmain);
+	/** Called when the activity is first created. */
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+	    super.onCreate(savedInstanceState);
+	    
+	    requestWindowFeature(Window.FEATURE_NO_TITLE);		
+	    Context con = this.getApplicationContext();
+	    res = getResources();
+	    ShopperFragmentActivity.con = con;
+	    loadItemList();
+		imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		
+		setContentView(R.layout.tabmain);
+		initialiseTabHost(savedInstanceState);
+		intialiseViewPager();
+		//if(itemList.getItemList().isEmpty()||((ViewGroup) itemList.display(true)).getChildCount()==0)
+		//	showItemList();
+		//else 
+		//	showShoppingList();
+	}
 
-	    tabHost = getTabHost();  // The activity TabHost
-	    TabHost.TabSpec spec ;  // Resusable TabSpec for each tab
+	
+	/**
+     * Initialise ViewPager
+     */
+    private void intialiseViewPager() {
 
+		List<Fragment> fragments = new LinkedList<Fragment>();
+		fragments.add(Fragment.instantiate(this, ItemListFragment.class.getName()));
+		fragments.add(Fragment.instantiate(this, ShoppingListFragment.class.getName()));
+		mPagerAdapter  = new ShoppingListPagerAdapter(super.getSupportFragmentManager(), fragments);
+		//
+		mViewPager = (ViewPager)super.findViewById(R.id.viewpager);
+		mViewPager.setAdapter(mPagerAdapter);
+		mViewPager.setOnPageChangeListener(this);
+    }
 
-	    // Initialize a TabSpec for each tab and add it to the TabHost
-	    spec = tabHost.newTabSpec(itemlist);
-	    spec.setIndicator("Item List", res.getDrawable(R.drawable.note));
-	    spec.setContent(this);//R.layout.main);
-	    tabHost.addTab(spec);
+	/**
+	 * Initialise the Tab Host
+	 */
+	private void initialiseTabHost(Bundle args) {
+		mTabHost = (TabHost)findViewById(android.R.id.tabhost);
+        mTabHost.setup();
+        AddTab(this, mTabHost, mTabHost.newTabSpec(itemlist).setIndicator("Item List",res.getDrawable(R.drawable.note)));
+        AddTab(this, mTabHost, mTabHost.newTabSpec(shoppingList).setIndicator("Shopping List",res.getDrawable(R.drawable.icon_shopping_cart)));
+        // Default to first tab
+        //this.onTabChanged("Tab1");
+        //
+        mTabHost.setOnTabChangedListener(this);
+	}
 
-	    // Do the same for the other tabs
-	    spec = tabHost.newTabSpec(shoppingList).setIndicator("Shopping List",res.getDrawable(R.drawable.icon_shopping_cart)).setContent(this);//R.layout.shoppinglist);
-	    tabHost.addTab(spec);
-
-	    tabHost.setOnTabChangedListener(this);
-
-
+	/**
+	 * Add Tab content to the Tabhost
+	 * @param activity
+	 * @param mTabHost
+	 * @param tabSpec
+	 * @param clss
+	 * @param args
+	 */
+	private static void AddTab(ShopperFragmentActivity activity, TabHost mTabHost, TabHost.TabSpec tabSpec) {
+		// Attach a Tab view factory to the spec
+		tabSpec.setContent(activity.new TabFactory(activity));
+        mTabHost.addTab(tabSpec);
 	}
     
 	public void showItemList(){
 		showShoppingList();
-		tabHost.setCurrentTabByTag(itemlist);
+		mTabHost.setCurrentTabByTag(itemlist);
 	}
 	public void displayItemList(){
 		//hiding keyboard
@@ -96,25 +147,25 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 		/*
 		if(layout == R.layout.newitem)
 			imm.hideSoftInputFromWindow(this.findViewById(R.id.EditText01).getWindowToken(), 0);*/
-		/*//tabHost.setCurrentTabByTag("items");
-		setContentViewCustom(R.layout.main);	*/
+		/*//mTabHost.setCurrentTabByTag("items");
+		setContentViewCustom(R.layout.itemlist);	*/
 			ScrollView sc=(ScrollView) this.findViewById(R.id.ScrollView01);
 			sc.removeAllViews();
 			View v= itemList.display(false);
 			sc.addView(v);	
-			layout = R.layout.main;
+			layout = R.layout.itemlist;
 			//this.findViewById(R.id.Button01).requestFocus();//Fix For TrackBall
 	}
 	
 	
 	public void showShoppingList(){
-		tabHost.setCurrentTabByTag(shoppingList);
+		mTabHost.setCurrentTabByTag(shoppingList);
 	}	
 	
 	public void displayShoppingList(){
 		/*setContentViewCustom(R.layout.shoppinglist);
 
-		//tabHost.setCurrentTabByTag("list");
+		//mTabHost.setCurrentTabByTag("list");
 */
 		layout = R.layout.shoppinglist;
 		debug("Shopping List");
@@ -147,26 +198,6 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 		Log.d(tag,debug);
 	}
 
-	/** Called when the activity is first created. */
-	
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-	    super.onCreate(savedInstanceState);
-	    
-	    requestWindowFeature(Window.FEATURE_NO_TITLE);		
-	    Context con = this.getApplicationContext();
-	    res = getResources();
-	    shopper.con = con;
-	    loadItemList();
-		imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-		
-		setUpTabs();
-		if(itemList.getItemList().isEmpty()||((ViewGroup) itemList.display(true)).getChildCount()==0)
-			showItemList();
-		else 
-			showShoppingList();
-	}
-
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -181,7 +212,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 
 	public void refreshView(){
 		switch(layout){
-	        case R.layout.main:showItemList();break;
+	        case R.layout.itemlist:showItemList();break;
 	        case R.layout.newitem:showNewItem();break;//displayNewItem();break;
 	        case R.layout.shoppinglist:displayShoppingList();break;
         }
@@ -198,9 +229,10 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 
 	@Override
 	public void onBackPressed() {
-		if(layout!=R.layout.main){
+		if(layout!=R.layout.itemlist){
 			if(layout == R.layout.newitem) dismissDialog(DIALOG_NEW);
-			showItemList();
+			//showItemList();
+			displayItemList();
 			debug("BackPressed");
 		}else
 			super.onBackPressed();
@@ -212,7 +244,7 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 		debug("Layout - " + layout+"  Button - "+button);
 		String name = null;
 		switch(layout){
-		case R.layout.main:
+		case R.layout.itemlist:
 			switch(button){
 			case R.id.Button01:displayShoppingList();break;
 			case R.id.Button02:showNewItem();break;
@@ -325,21 +357,13 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 
 	@Override
 	public void onTabChanged(String tabId) {
-		if(tabId == itemlist)
-			displayItemList();
-		else if(tabId == shoppingList)
-			displayShoppingList();
+//		if(tabId == itemlist)
+//			displayItemList();
+//		else if(tabId == shoppingList)
+//			displayShoppingList();
+		int pos = this.mTabHost.getCurrentTab();
+		this.mViewPager.setCurrentItem(pos);
 		//shopper.debug(tabId);
-	}
-
-	@Override
-	public View createTabContent(String tag) {
-		LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		if(tag == itemlist)
-			return inflater.inflate(R.layout.main, null);
-		else if(tag == shoppingList)
-			return inflater.inflate(R.layout.shoppinglist, null);
-		return null;
 	}
 
 	@Override
@@ -406,4 +430,54 @@ public class shopper extends TabActivity implements OnClickListener, OnTabChange
 			e.printStackTrace();
 		}		
 	}
+
+	@Override
+	public void onPageScrollStateChanged(int arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPageScrolled(int arg0, float arg1, int arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPageSelected(int position) {
+		if(position == 0)
+			displayItemList();
+		else if(position == 1)
+			displayShoppingList();		
+		
+		mTabHost.setCurrentTab(position);
+	}
+	
+	/**
+	 * A simple factory that returns dummy views to the Tabhost
+	 * @author mwho
+	 */
+	class TabFactory implements TabContentFactory {
+
+		private final Context mContext;
+
+	    /**
+	     * @param context
+	     */
+	    public TabFactory(Context context) {
+	        mContext = context;
+	    }
+
+	    /** (non-Javadoc)
+	     * @see android.widget.TabHost.TabContentFactory#createTabContent(java.lang.String)
+	     */
+	    public View createTabContent(String tag) {
+	        View v = new View(mContext);
+	        v.setMinimumWidth(0);
+	        v.setMinimumHeight(0);
+	        return v;
+	    }
+
+	}
 }
+
