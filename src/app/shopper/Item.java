@@ -44,7 +44,7 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 		if(oneTime) name += " (once)";		
 		if(shoppingList){
 			if(onShoppingList){
-				TextView tView = new TextView(shopper.con);
+				TextView tView = new TextView(ShopperFragmentActivity.con);
 				tView.setText(name);
 				tView.setClickable(true);
 				tView.setOnClickListener(this);
@@ -54,7 +54,7 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 			}else 
 				return null;
 		}else{
-			CheckBox check=new CheckBox(shopper.con);
+			CheckBox check=new CheckBox(ShopperFragmentActivity.con);
 			check.setText(name);
 			check.setChecked(onShoppingList);
 			check.setOnCheckedChangeListener(this);
@@ -99,7 +99,7 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		shopper.debug("name"+ " "+ isChecked);
+		ShopperFragmentActivity.debug("name"+ " "+ isChecked);
 		onShoppingList = isChecked;
 	}
 

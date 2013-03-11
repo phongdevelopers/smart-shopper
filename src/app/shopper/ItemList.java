@@ -13,17 +13,17 @@ import android.widget.LinearLayout;
 public class ItemList {
 	@ElementList
 	private TreeSet<Item> itemList =new TreeSet<Item>();
-	private shopper parent;
+	private ShopperFragmentActivity parent;
 	
-	public shopper getParent() {
+	public ShopperFragmentActivity getParent() {
 		return parent;
 	}
 
-	public void setParent(shopper parent) {
+	public void setParent(ShopperFragmentActivity parent) {
 		this.parent = parent;
 	}
 
-	public ItemList(shopper shopper) {
+	public ItemList(ShopperFragmentActivity shopper) {
 		super();
 		parent = shopper;
 	}
@@ -68,12 +68,12 @@ public class ItemList {
 				return index;
 			index++;
 		}
-		shopper.debug("Unable to find" + text);
+		ShopperFragmentActivity.debug("Unable to find" + text);
 		return 0;
 	}
 	
 	public View display(boolean shoppingList) {
-		LinearLayout ll = new LinearLayout(shopper.con);
+		LinearLayout ll = new LinearLayout(ShopperFragmentActivity.con);
 		ll.setOrientation(LinearLayout.VERTICAL);
 		Iterator<Item> iterator = itemList.iterator();
 		Item item= new Item(null);
