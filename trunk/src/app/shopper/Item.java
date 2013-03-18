@@ -15,10 +15,9 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 	@Attribute
 	private String name;
 	
-	private String quantity,defaultQuantity;
 	@Attribute
 	private boolean onShoppingList = true;
-	private boolean selected = false;
+	
 	@Attribute
 	private boolean oneTime;
 	private boolean deleteMe = false;
@@ -68,23 +67,17 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 	}
 	
 	public Item(String name) {
-		this(name,false,"1");
+		this(name,false);
 	}
 	
 	public Item(String name, Boolean oneTime){
-		this(name,oneTime,"1");		
+		this.name = name;
+		this.oneTime = oneTime;
 	}
 	
 	public Item(String name, Boolean oneTime, boolean onShoppingList){
-		this(name,oneTime,"1");		
+		this(name,oneTime);		
 		setOnShoppingList(onShoppingList);
-	}
-
-	public Item(String name, Boolean oneTime,String defaultQuantity ) {
-		this.name = name;
-		this.defaultQuantity = defaultQuantity;
-		quantity = null;
-		this.oneTime = oneTime;
 	}
 	
 	public void toBuy(){
@@ -96,19 +89,16 @@ public class Item implements OnCheckedChangeListener,Comparable<Item>,OnClickLis
 		if(oneTime)deleteMe=true;
 	}
 
-
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		ShopperFragmentActivity.debug("name"+ " "+ isChecked);
 		onShoppingList = isChecked;
 	}
 
-
 	@Override
 	public int compareTo(Item another) {
 		return(name.compareToIgnoreCase(another.name));
 	}
-
 
 	@Override
 	public void onClick(View v) {
