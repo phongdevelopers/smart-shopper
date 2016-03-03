@@ -1,0 +1,1 @@
+Based on similar JavaME app
